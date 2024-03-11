@@ -7,7 +7,7 @@ const headerOptions = {
 const JWTHeader = encodeBase64Url(
   JSON.stringify({ ...headerOptions, alg: "HS512" }),
 );
-const notary = await crypto.subtle.generateKey(
+const key = await crypto.subtle.generateKey(
   { name: headerOptions.alg, hash: "SHA-512" },
   true,
   ["sign", "verify"],
@@ -16,10 +16,7 @@ const notary = await crypto.subtle.generateKey(
 export const sign = async (
   rawpayload: { [key: string]: string | number },
 ): Promise<string> => {
-  const payload = encodeBase64Url(JSON.stringify({
-    ...rawpayload,
-    iat: Math.floor(Date.now() / 1000),
-  }));
+  const payload = encodeBase64Url(JSON.stringify(rawpayload));
   const hashSigningInput = await crypto.subtle.digest(
     "SHA-256",
     new TextEncoder().encode(`${JWTHeader}.${payload}`),
@@ -27,7 +24,7 @@ export const sign = async (
   const rawsignature = await crypto.subtle
     .sign(
       headerOptions.alg,
-      notary,
+      key,
       hashSigningInput,
     );
   const signature = encodeBase64Url(
@@ -50,7 +47,7 @@ export const verify = async (
   // return fromBase64;
   const result = await crypto.subtle.verify(
     headerOptions.alg,
-    notary,
+    key,
     fromBase64,
     hashSigningInput,
   );
