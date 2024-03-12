@@ -1,4 +1,6 @@
-let key = await window.crypto.subtle.generateKey(
+import { encodeBase64Url } from "base64UrlEncode";
+
+const key = await window.crypto.subtle.generateKey(
   {
     name: "AES-GCM",
     length: 256,
@@ -8,30 +10,26 @@ let key = await window.crypto.subtle.generateKey(
 );
 
 export async function encryptData(
-  key: CryptoKey,
   data: ArrayBuffer,
-): Promise<ArrayBuffer> {
+): Promise<string> {
   const iv = window.crypto.getRandomValues(new Uint8Array(12));
-
+  const hashIncomingData = await window.crypto.subtle.digest(
+    "SHA-256",
+    data,
+  );
   const encryptedData = await window.crypto.subtle.encrypt(
     {
       name: "AES-GCM",
       iv,
     },
     key,
-    data,
+    hashIncomingData,
   );
 
-  return encryptedData;
+  return encodeBase64Url(encryptedData);
 }
 
-// Example usage:
-// const dataToEncrypt = new TextEncoder().encode("Hello, World!");
-// const encryptedData = await encryptData(key, dataToEncrypt);
-// console.log(encryptedData);
-
 export async function decryptData(
-  key: CryptoKey,
   encryptedData: ArrayBuffer,
 ): Promise<ArrayBuffer> {
   const iv = new Uint8Array(encryptedData.slice(0, 12));

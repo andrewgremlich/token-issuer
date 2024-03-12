@@ -3,7 +3,8 @@ import { Handlers } from "$fresh/server.ts";
 import { z } from "zod";
 
 import { errorHandler } from "~utils/errorHandler.ts";
-import { getTokenRequirements, setTokenRequirements } from "~utils/kv.ts";
+import { setTokenRequirements } from "~utils/kv.ts";
+import { encryptData } from "~utils/encryptor.ts";
 
 const TokenRequirements = z.object({
   username: z.string(),
@@ -17,26 +18,24 @@ export const handler: Handlers = {
     try {
       const rawbody = await req.json();
       const body = TokenRequirements.parse(rawbody);
-      const hasTokenRequirements = getTokenRequirements(body);
 
-      // TODO: an expiration date would be checked
-      // TODO: But wait, I could store an API Key and the usage count in KV...
-      if (hasTokenRequirements) {
-        return new Response(JSON.stringify(hasTokenRequirements), {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-      }
+      // encrypt username and password here
+      const encryptedData = await encryptData(
+        new TextEncoder().encode(JSON.stringify(body)),
+      );
 
-      const tokenRequirements = await setTokenRequirements(body, {
-        usageCount: 0,
-        expirationDate: new Date(),
-        apiToken: Math.random().toString(36).slice(2),
-        ...body,
-      });
+      console.log(encryptedData);
 
-      return new Response(JSON.stringify(tokenRequirements), {
+      // then store username and password in KV
+
+      // await setTokenRequirements(body, {
+      //   usageCount: 0,
+      //   expirationDate: new Date(),
+      //   apiToken: Math.random().toString(36).slice(2),
+      //   ...body,
+      // });
+
+      return new Response(JSON.stringify({ "hello": "world" }), {
         headers: {
           "Content-Type": "application/json",
         },

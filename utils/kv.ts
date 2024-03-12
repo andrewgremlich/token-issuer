@@ -2,7 +2,7 @@ import { TokenRequirements } from "../routes/api/auth/token.ts";
 
 const kv = await Deno.openKv();
 
-export const getTokenRequirements = async (
+export const getTokenByUsername = async (
   { username, password }: TokenRequirements,
 ) => {
   return await kv.get([username, password]);
@@ -20,5 +20,17 @@ export const setTokenRequirements = async (
   { username, password }: TokenRequirements,
   tokenRequirements: TokenRequirementsValue,
 ) => {
-  await kv.set([username, password], tokenRequirements);
+  const primaryKey = [username, password];
+  const byApiToken = [tokenRequirements.apiToken];
+
+  const res = await kv.atomic()
+    .check({ key: primaryKey, versionstamp: null })
+    .check({ key: byApiToken, versionstamp: null })
+    .set(primaryKey, tokenRequirements)
+    .set(byApiToken, tokenRequirements)
+    .commit();
+
+  if (!res.ok) {
+    throw new TypeError("User with username and password already exists.");
+  }
 };
