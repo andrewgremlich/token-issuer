@@ -10,17 +10,15 @@ export const getTokenByUsername = async (
 
 type TokenRequirementsValue = {
   usageCount: number;
-  expirationDate: Date;
+  expirationDate: number;
   apiToken: string;
-  username: string;
-  password: string;
 };
 
 export const setTokenRequirements = async (
-  { username, password }: TokenRequirements,
+  userHash: string,
   tokenRequirements: TokenRequirementsValue,
 ) => {
-  const primaryKey = [username, password];
+  const primaryKey = [userHash];
   const byApiToken = [tokenRequirements.apiToken];
 
   const res = await kv.atomic()

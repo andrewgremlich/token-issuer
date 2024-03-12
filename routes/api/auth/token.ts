@@ -18,22 +18,17 @@ export const handler: Handlers = {
     try {
       const rawbody = await req.json();
       const body = TokenRequirements.parse(rawbody);
-
-      // encrypt username and password here
       const encryptedData = await encryptData(
         new TextEncoder().encode(JSON.stringify(body)),
       );
+      const inFourWeeks = 28 * 24 * 60 * 60;
+      const now = Temporal.Now.instant().epochSeconds;
 
-      console.log(encryptedData);
-
-      // then store username and password in KV
-
-      // await setTokenRequirements(body, {
-      //   usageCount: 0,
-      //   expirationDate: new Date(),
-      //   apiToken: Math.random().toString(36).slice(2),
-      //   ...body,
-      // });
+      await setTokenRequirements(encryptedData, {
+        usageCount: 0,
+        expirationDate: now + inFourWeeks,
+        apiToken: Math.random().toString(36).slice(2), // TODO: actually make a token!
+      });
 
       return new Response(JSON.stringify({ "hello": "world" }), {
         headers: {
