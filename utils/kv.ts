@@ -1,9 +1,11 @@
+import { TokenRequirements } from "../routes/api/auth/token.ts";
+
 const kv = await Deno.openKv();
 
 export const getTokenRequirements = async (
-  apiToken: string,
+  { username, password }: TokenRequirements,
 ) => {
-  return await kv.get([apiToken]);
+  return await kv.get([username, password]);
 };
 
 type TokenRequirementsValue = {
@@ -15,8 +17,8 @@ type TokenRequirementsValue = {
 };
 
 export const setTokenRequirements = async (
-  apiToken: string,
+  { username, password }: TokenRequirements,
   tokenRequirements: TokenRequirementsValue,
 ) => {
-  await kv.set([apiToken], tokenRequirements);
+  await kv.set([username, password], tokenRequirements);
 };
