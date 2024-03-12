@@ -29,7 +29,12 @@ export const handler: Handlers = {
         });
       }
 
-      const tokenRequirements = await setTokenRequirements(body, "api");
+      const tokenRequirements = await setTokenRequirements(body, {
+        usageCount: 0,
+        expirationDate: new Date(),
+        apiToken: Math.random().toString(36).slice(2),
+        ...body,
+      });
 
       return new Response(JSON.stringify(tokenRequirements), {
         headers: {
