@@ -3,27 +3,35 @@ import { Handlers } from "$fresh/server.ts";
 import { z } from "zod";
 
 import { errorHandler } from "~utils/errorHandler.ts";
+import { getTokenRequirements, setTokenRequirements } from "~utils/kv.ts";
 
-const User = z.object({
+const TokenRequirements = z.object({
   username: z.string(),
+  password: z.string(),
 });
 
-type User = z.infer<typeof User>;
+export type TokenRequirements = z.infer<typeof TokenRequirements>;
 
 export const handler: Handlers = {
   async POST(req, _ctx) {
     try {
-      const body = await req.json();
-      const user = User.parse(body);
+      const rawbody = await req.json();
+      const body = TokenRequirements.parse(rawbody);
+      const hasTokenRequirements = getTokenRequirements(body);
 
-      // Need to store server key somewhere...Deno KV?
-      // An issued API key should be verified against the server key
-      // And then an expiration date would be checked
+      // TODO: an expiration date would be checked
+      // TODO: But wait, I could store an API Key and the usage count in KV...
+      if (hasTokenRequirements) {
+        return new Response(JSON.stringify(hasTokenRequirements), {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
 
-      // But wait, I could store an API Key and the usage count in KV...
-      // That way billing could work...
+      const tokenRequirements = await setTokenRequirements(body, "api");
 
-      return new Response(JSON.stringify(user), {
+      return new Response(JSON.stringify(tokenRequirements), {
         headers: {
           "Content-Type": "application/json",
         },
