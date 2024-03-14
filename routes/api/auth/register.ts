@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { z } from "zod";
 
 import { errorHandler } from "~utils/errorHandler.ts";
-import { setRegister } from "~utils/kv.ts";
+import { getUser, setRegister } from "~utils/kv.ts";
 import { genApiKey, hashPassword } from "~utils/registerHash.ts";
 import { inFourWeeks } from "~utils/constants.ts";
 
@@ -18,6 +18,17 @@ export const handler: Handlers = {
     try {
       const rawbody = await req.json();
       const { username, password } = RegisterParams.parse(rawbody);
+      const user = await getUser(username);
+
+      if (user) {
+        return new Response(JSON.stringify({ "apiKey": user.apiKey }), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
+
       const hashAndEncryptPassword = hashPassword(password);
       const now = Temporal.Now.instant().epochSeconds;
       const apiKey = genApiKey(16);
@@ -29,7 +40,7 @@ export const handler: Handlers = {
         apiKey,
       });
 
-      return new Response(JSON.stringify({ "hello": username }), {
+      return new Response(JSON.stringify({ "apiKey": apiKey }), {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${apiKey}`,

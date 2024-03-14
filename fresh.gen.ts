@@ -10,10 +10,11 @@ import * as $api_auth_verify from "./routes/api/auth/verify.ts";
 import * as $api_dispenser_middleware from "./routes/api/dispenser/_middleware.ts";
 import * as $api_dispenser_issue from "./routes/api/dispenser/issue.ts";
 import * as $api_dispenser_verify from "./routes/api/dispenser/verify.ts";
-import * as $api_joke from "./routes/api/joke.ts";
 import * as $greet_name_ from "./routes/greet/[name].tsx";
 import * as $index from "./routes/index.tsx";
 import * as $Counter from "./islands/Counter.tsx";
+import * as $Register from "./islands/Register.tsx";
+import * as $Tokens from "./islands/Tokens.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -26,12 +27,13 @@ const manifest = {
     "./routes/api/dispenser/_middleware.ts": $api_dispenser_middleware,
     "./routes/api/dispenser/issue.ts": $api_dispenser_issue,
     "./routes/api/dispenser/verify.ts": $api_dispenser_verify,
-    "./routes/api/joke.ts": $api_joke,
     "./routes/greet/[name].tsx": $greet_name_,
     "./routes/index.tsx": $index,
   },
   islands: {
     "./islands/Counter.tsx": $Counter,
+    "./islands/Register.tsx": $Register,
+    "./islands/Tokens.tsx": $Tokens,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

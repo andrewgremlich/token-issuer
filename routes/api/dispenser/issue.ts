@@ -55,6 +55,7 @@ export const handler: Handlers = {
       if (separateTokens) {
         const tokens = [];
 
+        // TODO: be sure to indivdiualize each one time use token.
         for (const _t of Array.from({ length: numberOfTokens })) {
           const token = await sign(payload);
           tokens.push(token);

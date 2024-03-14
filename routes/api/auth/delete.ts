@@ -15,7 +15,7 @@ export const handler: Handlers = {
     try {
       const rawbody = await req.json();
       const { username } = DeleteParams.parse(rawbody);
-
+      // TODO: the exisiting user's password should be double checked before deleting
       await removeRegister(username);
 
       return new Response(JSON.stringify({ "hello": username }), {

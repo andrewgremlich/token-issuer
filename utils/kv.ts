@@ -1,3 +1,5 @@
+import { AuthorizationError } from "~utils/errorHandler.ts";
+
 type UserStoreValue = {
   usageCount: number;
   expirationDate: number;
@@ -45,7 +47,9 @@ export const setRegister = async (
     .commit();
 
   if (!res.ok) {
-    throw new TypeError("User with username and password already exists.");
+    throw new AuthorizationError(
+      "User with username and password already exists.",
+    );
   }
 };
 
