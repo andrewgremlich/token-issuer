@@ -1,13 +1,16 @@
-// Verify an Auth Key in order to use 'dispenser' routes
 import { Handlers } from "$fresh/server.ts";
-import { errorHandler } from "~utils/errorHandler.ts";
 
-import { decryptData } from "~utils/encryptor.ts";
-import { decodeBase64Url } from "base64UrlEncode";
+import { errorHandler } from "~utils/errorHandler.ts";
+import { getUser } from "~utils/kv.ts";
+import { verifyHash } from "~utils/registerHash.ts";
+
+import { RegisterParams } from "./register.ts";
 
 export const handler: Handlers = {
   async POST(req, _ctx) {
     try {
+      const rawbody = await req.json();
+      const { username, password } = RegisterParams.parse(rawbody);
       const auth = await req.headers.get("Authorization");
 
       if (!auth) {
@@ -15,15 +18,20 @@ export const handler: Handlers = {
       }
 
       const token = auth.split("Bearer ")[1];
-      const tokenDecoded = decodeBase64Url(token);
+      const user = await getUser(username);
 
-      console.log(decryptData(tokenDecoded));
+      if (user.apiKey !== token) {
+        throw new Error("Invalid token.");
+      }
 
-      return new Response(JSON.stringify({ message: "Hello, World!" }), {
-        headers: {
-          "Content-Type": "application/json",
+      return new Response(
+        JSON.stringify({ message: verifyHash(password, user.hashedPassword) }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
     } catch (error) {
       return errorHandler(error);
     }

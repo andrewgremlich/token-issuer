@@ -16,7 +16,7 @@ export const sign = async (
   const key = await getSigningKey();
   const payload = encodeBase64Url(JSON.stringify(rawpayload));
   const hashSigningInput = await crypto.subtle.digest(
-    "SHA-256",
+    "SHA-512",
     new TextEncoder().encode(`${JWTHeader}.${payload}`),
   );
   const rawsignature = await crypto.subtle
@@ -39,7 +39,7 @@ export const verify = async (
   const key = await getSigningKey();
   const fromBase64 = decodeBase64Url(rawsignature);
   const hashSigningInput = await crypto.subtle.digest(
-    "SHA-256",
+    "SHA-512",
     new TextEncoder().encode(signingInput),
   );
 

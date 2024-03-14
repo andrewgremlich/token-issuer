@@ -1,4 +1,9 @@
-import { TokenRequirements } from "../routes/api/auth/token.ts";
+type UserStoreValue = {
+  usageCount: number;
+  expirationDate: number;
+  apiKey: string;
+  hashedPassword: string;
+};
 
 const kv = await Deno.openKv();
 
@@ -6,34 +11,31 @@ export const setKey = async (label: string, key: JsonWebKey) => {
   await kv.set([label], key);
 };
 
-export const getKey = async (label: string): Promise<JsonWebKey> => {
+export const getKey = async (
+  label: string,
+): Promise<JsonWebKey | undefined> => {
   const privateKey = await kv.get<JsonWebKey>([label]);
 
   if (!privateKey.value) {
-    throw new Error("No private key found.");
+    console.error(`No key found for ${label}`);
+    return;
   }
 
   return privateKey.value;
 };
 
-export const getTokenByUsername = async (
-  { username, password }: TokenRequirements,
-) => {
-  return await kv.get([username, password]);
+export const getUser = async (
+  username: string,
+): Promise<UserStoreValue> => {
+  return (await kv.get([username])).value as UserStoreValue;
 };
 
-type TokenRequirementsValue = {
-  usageCount: number;
-  expirationDate: number;
-  apiToken: string;
-};
-
-export const setTokenRequirements = async (
-  userHash: string,
-  tokenRequirements: TokenRequirementsValue,
+export const setRegister = async (
+  username: string,
+  tokenRequirements: UserStoreValue,
 ) => {
-  const primaryKey = [userHash];
-  const byApiToken = [tokenRequirements.apiToken];
+  const primaryKey = [username];
+  const byApiToken = [tokenRequirements.apiKey];
 
   const res = await kv.atomic()
     .check({ key: primaryKey, versionstamp: null })
@@ -45,4 +47,8 @@ export const setTokenRequirements = async (
   if (!res.ok) {
     throw new TypeError("User with username and password already exists.");
   }
+};
+
+export const removeRegister = async (username: string) => {
+  await kv.delete([username]);
 };

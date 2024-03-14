@@ -32,6 +32,7 @@
     "tailwindcss": "npm:tailwindcss@3.4.1",
     "tailwindcss/": "npm:/tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js",
+    "scrypt": "jsr:@denorg/scrypt@4.3.4",
     "~utils/": "./utils/",
     "~components/": "./components/"
   },

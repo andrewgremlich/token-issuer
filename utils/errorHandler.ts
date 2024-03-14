@@ -25,6 +25,23 @@ export const errorHandler = (error: z.ZodError | SyntaxError) => {
     );
   }
 
+  const DENO_ENV = Deno.env.get("DENO_ENV");
+
+  if (DENO_ENV === "development") {
+    return new Response(
+      JSON.stringify({
+        error: true,
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }
+
   return new Response(
     JSON.stringify({
       error: true,
