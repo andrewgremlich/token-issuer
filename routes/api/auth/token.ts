@@ -6,7 +6,7 @@ import { errorHandler } from "~utils/errorHandler.ts";
 import { setTokenRequirements } from "~utils/kv.ts";
 import { encryptData } from "~utils/encryptor.ts";
 
-const TokenRequirements = z.object({
+export const TokenRequirements = z.object({
   username: z.string(),
   password: z.string(),
 });
@@ -27,12 +27,13 @@ export const handler: Handlers = {
       await setTokenRequirements(encryptedData, {
         usageCount: 0,
         expirationDate: now + inFourWeeks,
-        apiToken: Math.random().toString(36).slice(2), // TODO: actually make a token!
+        apiToken: Math.random().toString(36).slice(2), // TODO: actually make a token so that it can be verified using this same system.
       });
 
       return new Response(JSON.stringify({ "hello": "world" }), {
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${encryptedData}`,
         },
       });
     } catch (error) {

@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { z } from "zod";
 
-import { verify } from "~utils/apiKey.ts";
+import { verify } from "~utils/verify.ts";
 import { errorHandler } from "~utils/errorHandler.ts";
 
 const PostVerifyRequestBody = z.object({

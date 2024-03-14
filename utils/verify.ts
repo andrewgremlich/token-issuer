@@ -1,5 +1,7 @@
 import { decodeBase64Url, encodeBase64Url } from "base64UrlEncode";
 
+import { getSigningKey } from "./keys.ts";
+
 const headerOptions = {
   alg: "HMAC",
   typ: "JWT",
@@ -7,15 +9,11 @@ const headerOptions = {
 const JWTHeader = encodeBase64Url(
   JSON.stringify({ ...headerOptions, alg: "HS512" }),
 );
-const key = await crypto.subtle.generateKey(
-  { name: headerOptions.alg, hash: "SHA-512" },
-  true,
-  ["sign", "verify"],
-);
 
 export const sign = async (
   rawpayload: { [key: string]: string | number },
 ): Promise<string> => {
+  const key = await getSigningKey();
   const payload = encodeBase64Url(JSON.stringify(rawpayload));
   const hashSigningInput = await crypto.subtle.digest(
     "SHA-256",
@@ -38,6 +36,7 @@ export const verify = async (
   signingInput: string,
   rawsignature: string,
 ) => {
+  const key = await getSigningKey();
   const fromBase64 = decodeBase64Url(rawsignature);
   const hashSigningInput = await crypto.subtle.digest(
     "SHA-256",

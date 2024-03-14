@@ -2,6 +2,20 @@ import { TokenRequirements } from "../routes/api/auth/token.ts";
 
 const kv = await Deno.openKv();
 
+export const setKey = async (label: string, key: JsonWebKey) => {
+  await kv.set([label], key);
+};
+
+export const getKey = async (label: string): Promise<JsonWebKey> => {
+  const privateKey = await kv.get<JsonWebKey>([label]);
+
+  if (!privateKey.value) {
+    throw new Error("No private key found.");
+  }
+
+  return privateKey.value;
+};
+
 export const getTokenByUsername = async (
   { username, password }: TokenRequirements,
 ) => {

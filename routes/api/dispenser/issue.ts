@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { z } from "zod";
 
-import { sign } from "~utils/apiKey.ts";
+import { sign } from "~utils/verify.ts";
 import { errorHandler } from "~utils/errorHandler.ts";
 
 const PostIssueRequestBody = z.object({
