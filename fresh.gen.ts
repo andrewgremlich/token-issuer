@@ -7,6 +7,7 @@ import * as $_app from "./routes/_app.tsx";
 import * as $api_auth_delete from "./routes/api/auth/delete.ts";
 import * as $api_auth_register from "./routes/api/auth/register.ts";
 import * as $api_auth_verify from "./routes/api/auth/verify.ts";
+import * as $api_dispenser_middleware from "./routes/api/dispenser/_middleware.ts";
 import * as $api_dispenser_issue from "./routes/api/dispenser/issue.ts";
 import * as $api_dispenser_verify from "./routes/api/dispenser/verify.ts";
 import * as $api_joke from "./routes/api/joke.ts";
@@ -22,6 +23,7 @@ const manifest = {
     "./routes/api/auth/delete.ts": $api_auth_delete,
     "./routes/api/auth/register.ts": $api_auth_register,
     "./routes/api/auth/verify.ts": $api_auth_verify,
+    "./routes/api/dispenser/_middleware.ts": $api_dispenser_middleware,
     "./routes/api/dispenser/issue.ts": $api_dispenser_issue,
     "./routes/api/dispenser/verify.ts": $api_dispenser_verify,
     "./routes/api/joke.ts": $api_joke,

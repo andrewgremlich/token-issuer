@@ -5,6 +5,7 @@ import { getUser } from "~utils/kv.ts";
 import { verifyHash } from "~utils/registerHash.ts";
 
 import { RegisterParams } from "./register.ts";
+import { AuthorizationError } from "~utils/errorHandler.ts";
 
 export const handler: Handlers = {
   async POST(req, _ctx) {
@@ -14,7 +15,7 @@ export const handler: Handlers = {
       const auth = await req.headers.get("Authorization");
 
       if (!auth) {
-        throw new Error("No Authorization header provided.");
+        throw new AuthorizationError("No Authorization header provided.");
       }
 
       const token = auth.split("Bearer ")[1];

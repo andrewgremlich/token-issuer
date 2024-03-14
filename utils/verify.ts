@@ -34,20 +34,19 @@ export const sign = async (
 
 export const verify = async (
   signingInput: string,
-  rawsignature: string,
+  signature: string,
 ) => {
   const key = await getSigningKey();
-  const fromBase64 = decodeBase64Url(rawsignature);
+  const rawsignature = decodeBase64Url(signature);
   const hashSigningInput = await crypto.subtle.digest(
     "SHA-512",
     new TextEncoder().encode(signingInput),
   );
 
-  // return fromBase64;
   const result = await crypto.subtle.verify(
     headerOptions.alg,
     key,
-    fromBase64,
+    rawsignature,
     hashSigningInput,
   );
 

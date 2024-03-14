@@ -4,6 +4,7 @@ import { z } from "zod";
 import { errorHandler } from "~utils/errorHandler.ts";
 import { setRegister } from "~utils/kv.ts";
 import { genApiKey, hashPassword } from "~utils/registerHash.ts";
+import { inFourWeeks } from "~utils/constants.ts";
 
 export const RegisterParams = z.object({
   username: z.string(),
@@ -18,7 +19,6 @@ export const handler: Handlers = {
       const rawbody = await req.json();
       const { username, password } = RegisterParams.parse(rawbody);
       const hashAndEncryptPassword = hashPassword(password);
-      const inFourWeeks = 28 * 24 * 60 * 60;
       const now = Temporal.Now.instant().epochSeconds;
       const apiKey = genApiKey(16);
 

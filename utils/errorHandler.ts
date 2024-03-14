@@ -1,9 +1,29 @@
 import { z } from "zod";
 
-export const errorHandler = (error: z.ZodError | SyntaxError) => {
+export class AuthorizationError extends Error {
+  constructor(msg: string) {
+    super(msg);
+  }
+}
+
+export class TokenIssueError extends Error {
+  constructor(msg: string) {
+    super(msg);
+  }
+}
+
+export class TokenUseError extends Error {
+  constructor(msg: string) {
+    super(msg);
+  }
+}
+
+export const errorHandler = (
+  error: z.ZodError | SyntaxError | AuthorizationError | Error,
+) => {
   if (error instanceof z.ZodError) {
     return new Response(
-      JSON.stringify({ error: true, message: "Invalid request." }),
+      JSON.stringify({ error: true, message: error.message }),
       {
         status: 400,
         headers: {
@@ -15,9 +35,21 @@ export const errorHandler = (error: z.ZodError | SyntaxError) => {
 
   if (error instanceof SyntaxError) {
     return new Response(
-      JSON.stringify({ error: true, message: "Invalid JSON." }),
+      JSON.stringify({ error: true, message: error.message }),
       {
         status: 400,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }
+
+  if (error instanceof AuthorizationError) {
+    return new Response(
+      JSON.stringify({ error: true, message: error.message }),
+      {
+        status: 401,
         headers: {
           "Content-Type": "application/json",
         },
